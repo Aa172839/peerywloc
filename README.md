@@ -2,9 +2,11 @@
   <img src="wloc.jpg" width="144" />
 </p>
 
-# Apple WLOC 定位修改
+# Peery WLOC 定位（个人自用版）
 
 修改 Apple 网络定位服务 (WiFi/基站) 返回的坐标，实现 iOS 网络定位虚拟定位。打开在线选点页面选位置即可生效，无需手动填经纬度。
+
+> 本仓库是 Aa172839 的个人自用派生版本，于 2026-09-12 基于 Yu9191/wloc（经 Cafe2o4/wloc 镜像导入）修改，继续依照 AGPL-3.0 发布。
 
 > ⚠️ **iOS 27 beta 6 起，系统已禁止对 `gs-loc.apple.com` 进行 MITM 拦截。** 目前该版本及之后的 beta 版本暂时无法使用本项目，等待后续适配方案。
 
@@ -13,19 +15,19 @@
 ## 订阅地址
 
 **Surge:**
-https://raw.githubusercontent.com/Cafe2o4/wloc/refs/heads/main/modules/wloc.sgmodule
+https://raw.githubusercontent.com/Aa172839/peerywloc/refs/heads/main/modules/wloc.sgmodule
 
 **Quantumult X:**
-https://raw.githubusercontent.com/Cafe2o4/wloc/refs/heads/main/modules/wloc.conf
+https://raw.githubusercontent.com/Aa172839/peerywloc/refs/heads/main/modules/wloc.conf
 
 **Loon:**
-https://raw.githubusercontent.com/Cafe2o4/wloc/refs/heads/main/modules/wloc.lpx
+https://raw.githubusercontent.com/Aa172839/peerywloc/refs/heads/main/modules/wloc.lpx
 
 **Stash:**
-https://raw.githubusercontent.com/Cafe2o4/wloc/refs/heads/main/modules/wloc.stoverride
+https://raw.githubusercontent.com/Aa172839/peerywloc/refs/heads/main/modules/wloc.stoverride
 
 **Shadowrocket(小火箭):**
-https://raw.githubusercontent.com/Cafe2o4/wloc/refs/heads/main/modules/wloc.module
+https://raw.githubusercontent.com/Aa172839/peerywloc/refs/heads/main/modules/wloc.module
 
 > Egern 可直接使用 Surge 模块
 > Stash 请直接订阅上面的 `.stoverride`，无需用 Script Hub 转换
@@ -63,7 +65,7 @@ https://raw.githubusercontent.com/Cafe2o4/wloc/refs/heads/main/modules/wloc.modu
 
 ### 关于地图链接解析（worker）
 
-为了让苹果地图和高德走同一条流程，链接统一发给 `wloc-spoofer.wloc.workers.dev/api/parse` 解析：
+为了让苹果地图和高德走同一条流程，链接统一发给 `https://peery-wloc.peery112112.workers.dev/api/parse` 解析：
 
 - **高德**：分享出来是短链，真实坐标只藏在 302 跳转的 `Location` 头里，且是 GCJ-02 偏移坐标。快捷指令既读不到跳转头、也难做坐标换算，所以由 worker 跟跳转 → 抠坐标 → GCJ-02→WGS84 → 返回经纬度。
 - **苹果地图**：链接里直接带 `coordinate=纬度,经度`，但在**中国大陆同样是 GCJ-02 偏移坐标**，所以和高德一样由 worker 做 GCJ-02→WGS84 换算后返回；境外坐标会自动跳过换算（`out_of_china` 判断）原样返回。除了统一坐标系，走同一接口也方便统一处理短链、文本夹链接、名称解码等。
@@ -75,7 +77,7 @@ https://raw.githubusercontent.com/Cafe2o4/wloc/refs/heads/main/modules/wloc.modu
 - 路由：[`worker/src/index.js`](worker/src/index.js)
 - 链接解析与坐标换算：[`worker/src/parse.js`](worker/src/parse.js)
 - 选点页面：[`worker/src/page.js`](worker/src/page.js)、[`worker/src/gcj-browser.js`](worker/src/gcj-browser.js)
-- 部署后把快捷指令里的 `wloc-spoofer.wloc.workers.dev` 换成你自己的 worker 域名即可。
+- 快捷指令中的解析地址请使用 `https://peery-wloc.peery112112.workers.dev/api/parse`。
 
 解析逻辑带一套不联网的回归测试，改动后跑一下：
 
@@ -212,14 +214,14 @@ cd worker && npm install && npm test
 <details>
 <summary><b>自部署 Worker（推荐）</b></summary>
 
-公共选点页面有请求上限，建议部署自己的实例：
+本自用版本使用以下 Worker 实例：
 
-- **Workers**: `https://wloc-spoofer.wloc.workers.dev/`
-- **Pages**: `https://wloc-pages.pages.dev/`
+- **Workers**: `https://peery-wloc.peery112112.workers.dev/`
+- **Pages（可选）**: 如需 Pages，请按下方命令另行部署后填写实际地址。
 
 **一键部署（Workers）：**
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Cafe2o4/wloc/tree/main/worker)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Aa172839/peerywloc/tree/main/worker)
 
 > 一键部署仅支持 Workers 模式，点击按钮后按提示授权即可完成部署。
 
@@ -227,8 +229,8 @@ cd worker && npm install && npm test
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/Cafe2o4/wloc.git
-cd wloc/worker
+git clone https://github.com/Aa172839/peerywloc.git
+cd peerywloc/worker
 
 # 2. 安装依赖
 npm install
@@ -240,7 +242,7 @@ npx wrangler login
 npm run deploy
 ```
 
-部署成功后会得到你自己的 Worker 地址（如 `https://wloc-spoofer.<你的子域名>.workers.dev`），用这个地址选点即可。
+部署成功后的 Worker 地址为 `https://peery-wloc.peery112112.workers.dev/`，用这个地址选点即可。
 
 > 免费账户每天 10 万次请求，个人使用完全够用。
 
@@ -250,8 +252,8 @@ npm run deploy
 Pages 部署不支持一键按钮，需要手动执行：
 
 ```bash
-git clone https://github.com/Yu9191/wloc.git
-cd wloc/worker
+git clone https://github.com/Aa172839/peerywloc.git
+cd peerywloc/worker
 npm install
 npm run pages:deploy
 ```
@@ -296,9 +298,9 @@ Pages 和 Workers 功能完全一致，按需选择即可。
 
 ---
 
-> 本仓库为项目镜像备份，原作者 Yu9191，原仓库临时下架。
-> 本仓库仅做存档备份，本人并非项目原作者，所有代码遵循上游 AGPL-3.0 开源协议。
+> 个人自用派生版本，原作者为 Yu9191；由 Aa172839/Peery 于 2026-09-12 基于 Cafe2o4/wloc 镜像修改并维护。
+> 保留原项目、镜像来源和贡献者署名；本派生版本继续遵循 AGPL-3.0 开源协议。
 
 ## 许可证
 
-本项目采用 [AGPL-3.0](LICENSE) 许可证。未经授权，禁止将本项目代码用于商业产品或上架应用商店。
+本项目采用 [AGPL-3.0](LICENSE) 许可证。另保留上游 README 所附声明：未经授权，禁止将本项目代码用于商业产品或上架应用商店。
