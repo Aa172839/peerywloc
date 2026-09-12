@@ -144,6 +144,7 @@ body { font-family:-apple-system,system-ui,"SF Pro","Helvetica Neue",sans-serif;
     </div>
   </div>
   <div class="status" id="status">选好位置后点击「储存到设备」写入代理工具</div>
+  <div class="status"><a href="https://github.com/Aa172839/peerywloc" target="_blank" rel="noopener noreferrer" style="color:var(--gray)">源代码（AGPL-3.0）</a></div>
 </div>
 <div class="toast" id="toast"></div>
 <div class="modal-overlay" id="favModal">
